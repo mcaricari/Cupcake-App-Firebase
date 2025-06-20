@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "424225825516",
+    "project_id": "cupcake-app-bc442",
+    "storage_bucket": "cupcake-app-bc442.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:424225825516:android:c6feeaa30a8b1df8e1bbc9",
+        "android_client_info": {
+          "package_name": "com.taller.firebase.cupcakeapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCQzCTGHHjJBSVzMbKx_IXjaDFyQ4l4KhE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
