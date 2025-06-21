@@ -17,6 +17,8 @@ package com.taller.firebase.cupcakeapp
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -46,7 +48,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.google.firebase.Firebase
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.analytics
 import com.google.firebase.crashlytics.crashlytics
+import com.taller.firebase.cupcakeapp.analytics.CustomEvents
+import com.taller.firebase.cupcakeapp.analytics.CustomParameters
 import com.taller.firebase.cupcakeapp.data.DataSource
 import com.taller.firebase.cupcakeapp.data.OrderUiState
 import com.taller.firebase.cupcakeapp.exception.DateTooCloseException
@@ -150,6 +156,7 @@ fun CupcakeApp(
                     },
                     onCancelButtonClicked = {
                         cancelOrderAndNavigateToStart(viewModel, navController)
+                        logOrderCancelledEvent(CupcakeScreen.Flavor.name)
                     },
                     options = DataSource.flavors.map { id -> context.resources.getString(id) },
                     onSelectionChanged = { viewModel.setFlavor(it) },
@@ -165,6 +172,7 @@ fun CupcakeApp(
                     },
                     onCancelButtonClicked = {
                         cancelOrderAndNavigateToStart(viewModel, navController)
+                        logOrderCancelledEvent(CupcakeScreen.Pickup.name)
                     },
                     options = uiState.pickupOptions,
                     onSelectionChanged = { viewModel.setDate(it) },
@@ -177,12 +185,14 @@ fun CupcakeApp(
                     orderUiState = uiState,
                     onCancelButtonClicked = {
                         cancelOrderAndNavigateToStart(viewModel, navController)
+                        logOrderCancelledEvent(CupcakeScreen.Summary.name)
                     },
                     onSendButtonClicked = { subject: String, summary: String ->
                         //shareOrder(context, subject = subject, summary = summary)
                         checkStock(uiState.quantity, uiState.flavor)
                         checkDate(uiState.date)
                         fakeSend(context, viewModel, navController)
+                        logOrderSentEvent(uiState.quantity, uiState.flavor)
                     },
                     modifier = Modifier.fillMaxHeight()
                 )
@@ -244,4 +254,20 @@ private fun checkDate(dateStr: String) {
     if (today == dateStr) {
         throw DateTooCloseException("Date too close. Order won't be satisfied")
     }
+}
+
+private fun logOrderCancelledEvent(screen: String) {
+    val params = Bundle().apply {
+        putString(FirebaseAnalytics.Param.SCREEN_NAME, screen)
+    }
+    Log.i("CupcakeScreen", "enviando orer cancelled")
+    Firebase.analytics.logEvent(CustomEvents.ORDER_CANCELLED, params)
+}
+
+private fun logOrderSentEvent(quantity: Int, flavour: String) {
+    val params = Bundle().apply {
+        putInt(FirebaseAnalytics.Param.QUANTITY, quantity)
+        putString(CustomParameters.FLAVOUR, flavour)
+    }
+    Firebase.analytics.logEvent(CustomEvents.ORDER_SENT, params)
 }
