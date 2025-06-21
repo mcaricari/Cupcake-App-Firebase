@@ -45,12 +45,19 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.google.firebase.Firebase
+import com.google.firebase.crashlytics.crashlytics
 import com.taller.firebase.cupcakeapp.data.DataSource
 import com.taller.firebase.cupcakeapp.data.OrderUiState
+import com.taller.firebase.cupcakeapp.exception.DateTooCloseException
+import com.taller.firebase.cupcakeapp.exception.OutOfStockException
 import com.taller.firebase.cupcakeapp.ui.OrderSummaryScreen
 import com.taller.firebase.cupcakeapp.ui.OrderViewModel
 import com.taller.firebase.cupcakeapp.ui.SelectOptionScreen
 import com.taller.firebase.cupcakeapp.ui.StartOrderScreen
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 /**
  * enum values that represent the screens in the app
@@ -125,6 +132,7 @@ fun CupcakeApp(
                     quantityOptions = DataSource.quantityOptions,
                     onNextButtonClicked = {
                         viewModel.setQuantity(it)
+                        Firebase.crashlytics.log("Selected quantity: $it")
                         navController.navigate(CupcakeScreen.Flavor.name)
                     },
                     modifier = Modifier
@@ -136,7 +144,10 @@ fun CupcakeApp(
                 val context = LocalContext.current
                 SelectOptionScreen(
                     subtotal = uiState.price,
-                    onNextButtonClicked = { navController.navigate(CupcakeScreen.Pickup.name) },
+                    onNextButtonClicked = {
+                        Firebase.crashlytics.log("Selected flavour: ${uiState.flavor}")
+                        navController.navigate(CupcakeScreen.Pickup.name)
+                    },
                     onCancelButtonClicked = {
                         cancelOrderAndNavigateToStart(viewModel, navController)
                     },
@@ -148,7 +159,10 @@ fun CupcakeApp(
             composable(route = CupcakeScreen.Pickup.name) {
                 SelectOptionScreen(
                     subtotal = uiState.price,
-                    onNextButtonClicked = { navController.navigate(CupcakeScreen.Summary.name) },
+                    onNextButtonClicked = {
+                        Firebase.crashlytics.log("Selected date: ${uiState.date}")
+                        navController.navigate(CupcakeScreen.Summary.name)
+                    },
                     onCancelButtonClicked = {
                         cancelOrderAndNavigateToStart(viewModel, navController)
                     },
@@ -166,6 +180,8 @@ fun CupcakeApp(
                     },
                     onSendButtonClicked = { subject: String, summary: String ->
                         //shareOrder(context, subject = subject, summary = summary)
+                        checkStock(uiState.quantity, uiState.flavor)
+                        checkDate(uiState.date)
                         fakeSend(context, viewModel, navController)
                     },
                     modifier = Modifier.fillMaxHeight()
@@ -213,4 +229,19 @@ private fun fakeSend(
     toast.show()
     viewModel.resetOrder()
     navController.popBackStack(CupcakeScreen.Start.name, inclusive = false)
+}
+
+private fun checkStock(quantity: Int, flavour: String) {
+    if (quantity == 12 && flavour == "Coffee") {
+        throw OutOfStockException("Can't order 12 Coffee Cupcakes. Out of stock")
+    }
+}
+
+private fun checkDate(dateStr: String) {
+    val formatter = SimpleDateFormat("E MMM d", Locale.getDefault())
+    val calendar = Calendar.getInstance()
+    val today = formatter.format(calendar.time)
+    if (today == dateStr) {
+        throw DateTooCloseException("Date too close. Order won't be satisfied")
+    }
 }
