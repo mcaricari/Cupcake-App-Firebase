@@ -30,6 +30,7 @@ object DataSource {
     val configFetched = _configFetched.asStateFlow()
     lateinit var flavors: List<String>
     lateinit var quantityOptions: List<Pair<Int, Int>>
+    var pictureVariantEnabled = false
 
     init {
         val settings = remoteConfigSettings {
@@ -38,6 +39,7 @@ object DataSource {
         }
         val defaults = mapOf(
             "twelve_cupcakes_enabled" to true,
+            "picture_variant_enabled" to false,
             "flavour1" to "Vanilla",
             "flavour2" to "Chocolate",
             "flavour3" to "Red Velvet",
@@ -58,7 +60,7 @@ object DataSource {
                         getString("flavour4"),
                         getString("flavour5"),
                     )
-
+                    pictureVariantEnabled = getBoolean("picture_variant_enabled")
                     quantityOptions = if (getBoolean("twelve_cupcakes_enabled")) {
                         listOf(
                             Pair(R.string.one_cupcake, 1),

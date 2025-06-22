@@ -54,6 +54,11 @@ fun StartOrderScreen(
     onNextButtonClicked: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val picId = if (DataSource.pictureVariantEnabled) {
+        R.drawable.cupcake_variant
+    } else {
+        R.drawable.cupcake_default
+    }
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.SpaceBetween
@@ -65,7 +70,7 @@ fun StartOrderScreen(
         ) {
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_medium)))
             Image(
-                painter = painterResource(R.drawable.cupcake),
+                painter = painterResource(picId),
                 contentDescription = null,
                 modifier = Modifier.width(300.dp)
             )
