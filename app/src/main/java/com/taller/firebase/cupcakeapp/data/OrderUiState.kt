@@ -27,7 +27,7 @@ data class OrderUiState(
     /** Selected date for pickup (such as "Jan 1") */
     val date: String = "",
     /** Total price for the order */
-    val price: String = "",
+    val price: Double = 0.0,
     /** Available pickup dates for the order*/
     val pickupOptions: List<String> = listOf()
 )
