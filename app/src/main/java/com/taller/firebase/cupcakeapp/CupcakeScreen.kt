@@ -168,8 +168,9 @@ fun CupcakeApp(
                 )
             }
             composable(route = CupcakeScreen.Flavor.name) {
+                val context = LocalContext.current
                 SelectOptionScreen(
-                    subtotal = uiState.price,
+                    subtotal = FormatUtils.formatPrice(uiState.price),
                     onNextButtonClicked = {
                         Firebase.crashlytics.log("Selected flavour: ${uiState.flavor}")
                         navController.navigate(CupcakeScreen.Pickup.name)
@@ -178,14 +179,14 @@ fun CupcakeApp(
                         cancelOrderAndNavigateToStart(viewModel, navController)
                         logOrderCancelledEvent(CupcakeScreen.Flavor.name)
                     },
-                    options = DataSource.flavors,
+                    options = DataSource.flavors.map { id -> context.resources.getString(id) },
                     onSelectionChanged = { viewModel.setFlavor(it) },
                     modifier = Modifier.fillMaxHeight()
                 )
             }
             composable(route = CupcakeScreen.Pickup.name) {
                 SelectOptionScreen(
-                    subtotal = uiState.price,
+                    subtotal = FormatUtils.formatPrice(uiState.price),
                     onNextButtonClicked = {
                         Firebase.crashlytics.log("Selected date: ${uiState.date}")
                         navController.navigate(CupcakeScreen.Summary.name)

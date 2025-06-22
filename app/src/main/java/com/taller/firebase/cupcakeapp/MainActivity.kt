@@ -55,7 +55,6 @@ class MainActivity : ComponentActivity() {
             // Successfully signed in
             val user = FirebaseAuth.getInstance().currentUser
             Log.d(TAG, "onSignInResult success. User: ${user?.email}")
-            Toast.makeText(this, "Welcome ${user?.email}", Toast.LENGTH_SHORT).show()
             setContent {
                 CupcakeTheme {
                     val configFetched = DataSource.configFetched.collectAsState()

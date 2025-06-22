@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,8 +35,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
+import com.taller.firebase.cupcakeapp.FormatUtils
 import com.taller.firebase.cupcakeapp.R
+import com.taller.firebase.cupcakeapp.data.DataSource
 import com.taller.firebase.cupcakeapp.data.OrderUiState
 import com.taller.firebase.cupcakeapp.ui.components.FormattedPriceLabel
 
@@ -50,7 +54,7 @@ fun OrderSummaryScreen(
     onCancelButtonClicked: () -> Unit,
     onSendButtonClicked: (String, String) -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     val resources = LocalContext.current.resources
 
     val numberOfCupcakes = resources.getQuantityString(
@@ -91,10 +95,27 @@ fun OrderSummaryScreen(
                 Divider(thickness = dimensionResource(R.dimen.thickness_divider))
             }
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
-            FormattedPriceLabel(
-                subtotal = orderUiState.price,
-                modifier = Modifier.align(Alignment.End)
-            )
+            if (DataSource.showDiscount) {
+                FormattedPriceLabel(
+                    subtotal = FormatUtils.formatPrice(orderUiState.price),
+                    textDecoration = TextDecoration.LineThrough,
+                    modifier = Modifier.align(Alignment.End)
+                )
+                FormattedPriceLabel(
+                    subtotal = FormatUtils.formatPrice(orderUiState.price.toFloat().times(0.9)),
+                    modifier = Modifier.align(Alignment.End)
+                )
+                Text(
+                    text = "Discount applied!",
+                    style = MaterialTheme.typography.labelSmall,
+                    modifier = Modifier.align(Alignment.End)
+                )
+            } else {
+                FormattedPriceLabel(
+                    subtotal = FormatUtils.formatPrice(orderUiState.price),
+                    modifier = Modifier.align(Alignment.End)
+                )
+            }
         }
         Row(
             modifier = Modifier
@@ -123,9 +144,9 @@ fun OrderSummaryScreen(
 
 @Preview
 @Composable
-fun OrderSummaryPreview(){
+fun OrderSummaryPreview() {
     OrderSummaryScreen(
-        orderUiState = OrderUiState(0, "Test", "Test", "$300.00"),
+        orderUiState = OrderUiState(0, "Test", "Test", 5.00),
         onSendButtonClicked = { subject: String, summary: String -> },
         onCancelButtonClicked = {},
         modifier = Modifier.fillMaxHeight()
