@@ -16,24 +16,75 @@
 package com.taller.firebase.cupcakeapp
 
 import android.os.Bundle
+import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
 import androidx.core.view.WindowCompat
+import com.firebase.ui.auth.AuthUI
+import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
+import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.google.firebase.auth.FirebaseAuth
 import com.taller.firebase.cupcakeapp.data.DataSource
 import com.taller.firebase.cupcakeapp.ui.theme.CupcakeTheme
 
 class MainActivity : ComponentActivity() {
+    private val signInLauncher = registerForActivityResult(
+        FirebaseAuthUIActivityResultContract(),
+    ) { res ->
+        this.onSignInResult(res)
+    }
+    private val providers = arrayListOf(
+        AuthUI.IdpConfig.EmailBuilder().build(),
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContent {
-            CupcakeTheme {
-                val configFetched = DataSource.configFetched.collectAsState()
-                if (configFetched.value) {
-                    CupcakeApp()
+        val signInIntent = AuthUI.getInstance()
+            .createSignInIntentBuilder()
+            .setAvailableProviders(providers)
+            .build()
+        signInLauncher.launch(signInIntent)
+    }
+
+    private fun onSignInResult(result: FirebaseAuthUIAuthenticationResult) {
+        val response = result.idpResponse
+        if (result.resultCode == RESULT_OK) {
+            // Successfully signed in
+            val user = FirebaseAuth.getInstance().currentUser
+            Log.d(TAG, "onSignInResult success. User: ${user?.email}")
+            Toast.makeText(this, "Welcome ${user?.email}", Toast.LENGTH_SHORT).show()
+            setContent {
+                CupcakeTheme {
+                    val configFetched = DataSource.configFetched.collectAsState()
+                    if (configFetched.value) {
+                        CupcakeApp(userName = user?.displayName)
+                    }
+                }
+            }
+
+        } else {
+            // Sign in failed. If response is null the user canceled the
+            // sign-in flow using the back button. Otherwise check
+            // response.getError().getErrorCode() and handle the error.
+            // ...
+            Log.d(TAG, "onSignInResult error: ${response?.error?.errorCode}")
+            setContent {
+                CupcakeTheme {
+                    LoginErrorScreen()
                 }
             }
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        AuthUI.getInstance().signOut(this)
+    }
+
+    private companion object {
+        const val TAG = "MainActivity"
     }
 }

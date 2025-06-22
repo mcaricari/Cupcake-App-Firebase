@@ -14,6 +14,7 @@ navigationCompose = "2.9.0"
 googleServices = "4.4.2"
 firebaseBom = "33.15.0"
 crashlytics = "3.0.4"
+firebaseUi = "9.0.0"
 
 [libraries]
 androidx-core = { module = "androidx.test:core", version.ref = "core" }
@@ -38,6 +39,8 @@ google-firebase-analytics = { group = "com.google.firebase", name = "firebase-an
 google-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 google-firebase-config = { group = "com.google.firebase", name = "firebase-config" }
 google-firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+firebase-ui = { group = "com.firebaseui", name = "firebase-ui-auth", version.ref = "firebaseUi" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
