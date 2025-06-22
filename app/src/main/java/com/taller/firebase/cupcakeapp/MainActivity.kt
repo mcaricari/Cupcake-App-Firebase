@@ -18,7 +18,9 @@ package com.taller.firebase.cupcakeapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.collectAsState
 import androidx.core.view.WindowCompat
+import com.taller.firebase.cupcakeapp.data.DataSource
 import com.taller.firebase.cupcakeapp.ui.theme.CupcakeTheme
 
 class MainActivity : ComponentActivity() {
@@ -27,7 +29,10 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         setContent {
             CupcakeTheme {
-                CupcakeApp()
+                val configFetched = DataSource.configFetched.collectAsState()
+                if (configFetched.value) {
+                    CupcakeApp()
+                }
             }
         }
     }

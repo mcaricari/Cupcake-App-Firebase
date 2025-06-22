@@ -147,7 +147,6 @@ fun CupcakeApp(
                 )
             }
             composable(route = CupcakeScreen.Flavor.name) {
-                val context = LocalContext.current
                 SelectOptionScreen(
                     subtotal = uiState.price,
                     onNextButtonClicked = {
@@ -158,7 +157,7 @@ fun CupcakeApp(
                         cancelOrderAndNavigateToStart(viewModel, navController)
                         logOrderCancelledEvent(CupcakeScreen.Flavor.name)
                     },
-                    options = DataSource.flavors.map { id -> context.resources.getString(id) },
+                    options = DataSource.flavors,
                     onSelectionChanged = { viewModel.setFlavor(it) },
                     modifier = Modifier.fillMaxHeight()
                 )
