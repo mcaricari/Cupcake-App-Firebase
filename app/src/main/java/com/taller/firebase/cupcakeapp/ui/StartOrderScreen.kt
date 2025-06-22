@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.taller.firebase.cupcakeapp.R
@@ -48,10 +49,11 @@ import com.taller.firebase.cupcakeapp.data.DataSource
  */
 @Composable
 fun StartOrderScreen(
+    userName: String,
     quantityOptions: List<Pair<Int, Int>>,
     onNextButtonClicked: (Int) -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.SpaceBetween
@@ -74,6 +76,12 @@ fun StartOrderScreen(
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
         }
+        Text(
+            text = "Welcome $userName!",
+            style = MaterialTheme.typography.headlineSmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+        )
         Row(modifier = Modifier.weight(1f, false)) {
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -102,7 +110,7 @@ fun SelectQuantityButton(
     @StringRes labelResourceId: Int,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
-){
+) {
     Button(
         onClick = onClick,
         modifier = modifier.widthIn(min = 250.dp)
@@ -113,10 +121,13 @@ fun SelectQuantityButton(
 
 @Preview
 @Composable
-fun StartOrderPreview(){
+fun StartOrderPreview() {
     StartOrderScreen(
         quantityOptions = DataSource.quantityOptions,
         onNextButtonClicked = {},
-        modifier = Modifier.fillMaxSize().padding(dimensionResource(R.dimen.padding_medium))
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(dimensionResource(R.dimen.padding_medium)),
+        userName = "user"
     )
 }

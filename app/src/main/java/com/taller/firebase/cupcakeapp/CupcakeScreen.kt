@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -47,6 +48,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.firebase.ui.auth.AuthUI
 import com.google.firebase.Firebase
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.analytics
@@ -86,6 +88,7 @@ fun CupcakeAppBar(
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     TopAppBar(
         title = { Text(stringResource(currentScreen.title)) },
         colors = TopAppBarDefaults.mediumTopAppBarColors(
@@ -101,12 +104,29 @@ fun CupcakeAppBar(
                     )
                 }
             }
+        },
+        actions = {
+            IconButton(
+                onClick = {
+                    AuthUI.getInstance().signOut(context)
+                    val intent = Intent(context, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                    context.startActivity(intent)
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                    contentDescription = null
+                )
+            }
         }
     )
 }
 
 @Composable
 fun CupcakeApp(
+    userName: String?,
     viewModel: OrderViewModel = viewModel(),
     navController: NavHostController = rememberNavController()
 ) {
@@ -135,6 +155,7 @@ fun CupcakeApp(
         ) {
             composable(route = CupcakeScreen.Start.name) {
                 StartOrderScreen(
+                    userName = userName ?: "",
                     quantityOptions = DataSource.quantityOptions,
                     onNextButtonClicked = {
                         viewModel.setQuantity(it)
