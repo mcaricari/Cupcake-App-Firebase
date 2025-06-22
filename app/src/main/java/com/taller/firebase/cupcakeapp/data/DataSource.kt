@@ -15,21 +15,78 @@
  */
 package com.taller.firebase.cupcakeapp.data
 
+import android.util.Log
+import com.google.firebase.Firebase
+import com.google.firebase.remoteconfig.remoteConfig
+import com.google.firebase.remoteconfig.remoteConfigSettings
 import com.taller.firebase.cupcakeapp.R
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 
 object DataSource {
-    val flavors = listOf(
-        R.string.vanilla,
-        R.string.chocolate,
-        R.string.red_velvet,
-        R.string.salted_caramel,
-        R.string.coffee
-    )
+    private const val TAG = "DataSource"
+    private val _configFetched = MutableStateFlow(false)
+    val configFetched = _configFetched.asStateFlow()
+    lateinit var flavors: List<String>
+    lateinit var quantityOptions: List<Pair<Int, Int>>
 
-    val quantityOptions = listOf(
-        Pair(R.string.one_cupcake, 1),
-        Pair(R.string.six_cupcakes, 6),
-        Pair(R.string.twelve_cupcakes, 12)
-    )
+    init {
+        val settings = remoteConfigSettings {
+            minimumFetchIntervalInSeconds = 10
+            fetchTimeoutInSeconds = 10
+        }
+        val defaults = mapOf(
+            "twelve_cupcakes_enabled" to true,
+            "flavour1" to "Vanilla",
+            "flavour2" to "Chocolate",
+            "flavour3" to "Red Velvet",
+            "flavour4" to "Salted Caramel",
+            "flavour5" to "Coffee",
+        )
+        Firebase.remoteConfig.apply {
+            setConfigSettingsAsync(settings)
+            setDefaultsAsync(defaults)
+            fetchAndActivate().addOnCompleteListener { task ->
+                _configFetched.value = true
+                if (task.isSuccessful) {
+                    Log.i(TAG, "Remote config fetch successful")
+                    flavors = listOf(
+                        getString("flavour1"),
+                        getString("flavour2"),
+                        getString("flavour3"),
+                        getString("flavour4"),
+                        getString("flavour5"),
+                    )
+
+                    quantityOptions = if (getBoolean("twelve_cupcakes_enabled")) {
+                        listOf(
+                            Pair(R.string.one_cupcake, 1),
+                            Pair(R.string.six_cupcakes, 6),
+                            Pair(R.string.twelve_cupcakes, 12)
+                        )
+                    } else {
+                        listOf(
+                            Pair(R.string.one_cupcake, 1),
+                            Pair(R.string.six_cupcakes, 6)
+                        )
+                    }
+                } else {
+                    Log.e(TAG, "Remote config fetch failed")
+                    flavors = listOf(
+                        "Vanilla",
+                        "Chocolate",
+                        "Red Velvet",
+                        "Salted Caramel",
+                        "Coffee",
+                    )
+                    quantityOptions = listOf(
+                        Pair(R.string.one_cupcake, 1),
+                        Pair(R.string.six_cupcakes, 6),
+                        Pair(R.string.twelve_cupcakes, 12)
+                    )
+                }
+            }
+        }
+    }
 }
