@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -56,6 +57,7 @@ import com.google.firebase.crashlytics.crashlytics
 import com.taller.firebase.cupcakeapp.analytics.CustomEvents
 import com.taller.firebase.cupcakeapp.analytics.CustomParameters
 import com.taller.firebase.cupcakeapp.data.DataSource
+import com.taller.firebase.cupcakeapp.data.FirestoreDb
 import com.taller.firebase.cupcakeapp.data.OrderUiState
 import com.taller.firebase.cupcakeapp.exception.DateTooCloseException
 import com.taller.firebase.cupcakeapp.exception.OutOfStockException
@@ -63,6 +65,7 @@ import com.taller.firebase.cupcakeapp.ui.OrderSummaryScreen
 import com.taller.firebase.cupcakeapp.ui.OrderViewModel
 import com.taller.firebase.cupcakeapp.ui.SelectOptionScreen
 import com.taller.firebase.cupcakeapp.ui.StartOrderScreen
+import com.taller.firebase.cupcakeapp.ui.history.OrderHistoryScreen
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -74,7 +77,8 @@ enum class CupcakeScreen(@StringRes val title: Int) {
     Start(title = R.string.app_name),
     Flavor(title = R.string.choose_flavor),
     Pickup(title = R.string.choose_pickup_date),
-    Summary(title = R.string.order_summary)
+    Summary(title = R.string.order_summary),
+    History(title = R.string.order_history)
 }
 
 /**
@@ -86,6 +90,7 @@ fun CupcakeAppBar(
     currentScreen: CupcakeScreen,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
+    navigateToMyOrders: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -106,6 +111,16 @@ fun CupcakeAppBar(
             }
         },
         actions = {
+            if (currentScreen == CupcakeScreen.Start) {
+                IconButton(
+                    onClick = navigateToMyOrders
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Person,
+                        contentDescription = null
+                    )
+                }
+            }
             IconButton(
                 onClick = {
                     AuthUI.getInstance().signOut(context)
@@ -142,7 +157,8 @@ fun CupcakeApp(
             CupcakeAppBar(
                 currentScreen = currentScreen,
                 canNavigateBack = navController.previousBackStackEntry != null,
-                navigateUp = { navController.navigateUp() }
+                navigateUp = { navController.navigateUp() },
+                navigateToMyOrders = { navController.navigate(CupcakeScreen.History.name) }
             )
         }
     ) { innerPadding ->
@@ -214,9 +230,18 @@ fun CupcakeApp(
                         checkDate(uiState.date)
                         fakeSend(context, viewModel, navController)
                         logOrderSentEvent(uiState.quantity, uiState.flavor)
+                        val price = if (DataSource.showDiscount) {
+                            uiState.price.times(0.9)
+                        } else {
+                            uiState.price
+                        }
+                        FirestoreDb.saveOrder(uiState.quantity, uiState.flavor, price)
                     },
                     modifier = Modifier.fillMaxHeight()
                 )
+            }
+            composable(route = CupcakeScreen.History.name) {
+                OrderHistoryScreen()
             }
         }
     }

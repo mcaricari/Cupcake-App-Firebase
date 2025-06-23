@@ -61,6 +61,7 @@ dependencies {
     implementation(libs.google.firebase.crashlytics)
     implementation(libs.google.firebase.config)
     implementation(libs.google.firebase.auth)
+    implementation(libs.google.firebase.firestore)
     implementation(libs.firebase.ui)
 
     androidTestImplementation(libs.androidx.junit)

@@ -39,6 +39,7 @@ google-firebase-analytics = { group = "com.google.firebase", name = "firebase-an
 google-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 google-firebase-config = { group = "com.google.firebase", name = "firebase-config" }
 google-firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
+google-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 firebase-ui = { group = "com.firebaseui", name = "firebase-ui-auth", version.ref = "firebaseUi" }
 
 
