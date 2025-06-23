@@ -52,16 +52,16 @@ fun OrderItem(order: Order) {
             style = MaterialTheme.typography.titleMedium
         )
         Text(
-            text = "Cantidad: ${order.quantity}",
+            text = "Quantity: ${order.quantity}",
             style = MaterialTheme.typography.bodyMedium
         )
         Text(
-            text = "Precio: $${order.price}",
+            text = "Price: $${order.price}",
             style = MaterialTheme.typography.bodyMedium
         )
         Text(
-            text = "Fecha: ${order.date}",
-            style = MaterialTheme.typography.bodySmall,
+            text = "Date time: ${order.date}",
+            style = MaterialTheme.typography.bodyMedium,
         )
     }
 }

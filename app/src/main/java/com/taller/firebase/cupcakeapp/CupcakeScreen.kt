@@ -230,7 +230,12 @@ fun CupcakeApp(
                         checkDate(uiState.date)
                         fakeSend(context, viewModel, navController)
                         logOrderSentEvent(uiState.quantity, uiState.flavor)
-                        FirestoreDb.saveOrder(uiState.quantity, uiState.flavor, uiState.price)
+                        val price = if (DataSource.showDiscount) {
+                            uiState.price.times(0.9)
+                        } else {
+                            uiState.price
+                        }
+                        FirestoreDb.saveOrder(uiState.quantity, uiState.flavor, price)
                     },
                     modifier = Modifier.fillMaxHeight()
                 )
