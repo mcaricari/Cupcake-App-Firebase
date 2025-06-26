@@ -25,6 +25,7 @@ import androidx.core.view.WindowCompat
 import com.firebase.ui.auth.AuthUI
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult
+import com.google.android.gms.auth.api.Auth
 import com.google.firebase.auth.FirebaseAuth
 import com.taller.firebase.cupcakeapp.data.DataSource
 import com.taller.firebase.cupcakeapp.ui.theme.CupcakeTheme
@@ -36,7 +37,10 @@ class MainActivity : ComponentActivity() {
         this.onSignInResult(res)
     }
     private val providers = arrayListOf(
-        AuthUI.IdpConfig.EmailBuilder().build(),
+        AuthUI.IdpConfig.EmailBuilder()
+            .build(),
+        AuthUI.IdpConfig.AnonymousBuilder().build(),
+        AuthUI.IdpConfig.GoogleBuilder().build(),
     )
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +49,7 @@ class MainActivity : ComponentActivity() {
         val signInIntent = AuthUI.getInstance()
             .createSignInIntentBuilder()
             .setAvailableProviders(providers)
+            .setLogo(R.drawable.cupcake_default)
             .build()
         signInLauncher.launch(signInIntent)
     }
