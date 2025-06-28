@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.google.firebase.config)
     implementation(libs.google.firebase.auth)
     implementation(libs.google.firebase.firestore)
+    implementation(libs.google.firebase.messaging)
     implementation(libs.firebase.ui)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services)

@@ -42,6 +42,7 @@ google-firebase-crashlytics = { group = "com.google.firebase", name = "firebase-
 google-firebase-config = { group = "com.google.firebase", name = "firebase-config" }
 google-firebase-auth = { group = "com.google.firebase", name = "firebase-auth" }
 google-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+google-firebase-messaging = { group = "com.google.firebase", name = "firebase-messaging" }
 firebase-ui = { group = "com.firebaseui", name = "firebase-ui-auth", version.ref = "firebaseUi" }
 androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
 androidx-credentials-play-services = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
